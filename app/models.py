@@ -8,7 +8,7 @@ class User(db.Model):
     posts = db.relationship('Post', backref='author', lazy='dynamic')
 
     def __repr__(self):
-        return '<User {:r}'.format(self.nickname)
+        return '<User {!r}>'.format(self.nickname)
 
 
 class Post(db.Model):
@@ -18,4 +18,4 @@ class Post(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
     def __repr__(self):
-        return '<Post {:r}'.format(self.body)
+        return '<Post {!r}>'.format(self.body)
