@@ -55,3 +55,7 @@ target/
 
 # PyCharm files
 .idea/
+
+# Project specific files
+app.db
+search.db
