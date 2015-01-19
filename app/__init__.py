@@ -1,3 +1,7 @@
+import os
+from flask.ext.login import LoginManager
+from flask.ext.openid import OpenID
+from config import basedir
 from flask import Flask
 from flask.ext.sqlalchemy import SQLAlchemy
 
@@ -6,5 +10,11 @@ app = Flask(__name__)
 app.config.from_object('config')
 db = SQLAlchemy(app)
 
-# import after after app variable to prevent circular import
+# setup login manager and OpenID
+lm = LoginManager()
+lm.init_app(app)
+lm.login_view = 'login'
+oid = OpenID(app, os.path.join(basedir, 'tmp'))
+
+# import after after app last to prevent circular import
 from app import views, models
