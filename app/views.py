@@ -6,27 +6,7 @@ from .models import User
 from datetime import datetime
 
 
-@app.route('/')
-@app.route('/index')
-@login_required
-def index():
-    user = g.user
-    posts = [
-        {
-            'author': {'nickname': 'John'},
-            'body': 'Beautiful day in Portland!'
-        },
-        {
-            'author': {'nickname': 'Susan'},
-            'body': 'The Avengers movie was so cool!'
-        }
-    ]
-    return render_template('index.html',
-                           title='Home',
-                           user=user,
-                           posts=posts)
-
-
+# Session management
 @app.route('/login', methods=['GET', 'POST'])
 @oid.loginhandler
 def login():
@@ -40,10 +20,6 @@ def login():
                            title='Sign In',
                            form=form,
                            providers=app.config['OPENID_PROVIDERS'])
-
-@lm.user_loader
-def load_user(id):
-    return User.query.get(int(id))
 
 @oid.after_login
 def after_login(resp):
@@ -65,6 +41,15 @@ def after_login(resp):
     login_user(user, remember=remember_me)
     return redirect(request.args.get('next') or url_for('index'))
 
+@lm.user_loader
+def load_user(id):
+    return User.query.get(int(id))
+
+@app.route('/logout')
+def logout():
+    logout_user()
+    return redirect(url_for('index'))
+
 @app.before_request
 def before_request():
     g.user = current_user
@@ -73,10 +58,25 @@ def before_request():
         db.session.add(g.user)
         db.session.commit()
 
-@app.route('/logout')
-def logout():
-    logout_user()
-    return redirect(url_for('index'))
+@app.route('/')
+@app.route('/index')
+@login_required
+def index():
+    user = g.user
+    posts = [
+        {
+            'author': {'nickname': 'John'},
+            'body': 'Beautiful day in Portland!'
+        },
+        {
+            'author': {'nickname': 'Susan'},
+            'body': 'The Avengers movie was so cool!'
+        }
+    ]
+    return render_template('index.html',
+                           title='Home',
+                           user=user,
+                           posts=posts)
 
 @app.route('/user/<nickname>')
 @login_required
